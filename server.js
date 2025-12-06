@@ -23,8 +23,8 @@ app.get('/', (req, res) => {
 });
 
 // Routes
-// TODO: Add your routes here
-// app.use('/api/users', require('./routes/users'));
+app.use('/api/auth', require('./routes/auth'));
+app.use('/api/influencers', require('./routes/influencers'));
 
 // Error handling middleware
 app.use((err, req, res, next) => {
