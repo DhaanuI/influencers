@@ -1,6 +1,6 @@
 const Advertisement = require('../models/Advertisement');
 const Application = require('../models/Application');
-const Influencer = require('../models/Influencer');
+const User = require('../models/User');
 
 // @desc    Create new advertisement (Startup only)
 // @route   POST /api/advertisements
@@ -211,7 +211,6 @@ exports.deleteAdvertisement = async (req, res) => {
 exports.applyToAdvertisement = async (req, res) => {
   try {
     const advertisementId = req.params.id;
-    const User = require('../models/User');
 
     // Check plan restrictions
     const user = await User.findById(req.user.id);
@@ -238,19 +237,10 @@ exports.applyToAdvertisement = async (req, res) => {
       });
     }
 
-    // Get influencer profile
-    const influencer = await Influencer.findOne({ userId: req.user.id });
-    if (!influencer) {
-      return res.status(404).json({
-        success: false,
-        error: 'Please create your influencer profile first'
-      });
-    }
-
     // Check if already applied
     const existingApplication = await Application.findOne({
       advertisementId,
-      influencerId: influencer._id
+      userId: req.user.id
     });
 
     if (existingApplication) {
@@ -263,7 +253,6 @@ exports.applyToAdvertisement = async (req, res) => {
     // Create application
     const application = await Application.create({
       advertisementId,
-      influencerId: influencer._id,
       userId: req.user.id,
       status: 'pending'
     });
@@ -313,8 +302,7 @@ exports.getAdvertisementApplications = async (req, res) => {
     }
 
     const applications = await Application.find({ advertisementId: req.params.id })
-      .populate('influencerId')
-      .populate('userId', 'name email')
+      .populate('userId', 'name email bio followersCount category instagramUsername')
       .sort({ createdAt: -1 });
 
     res.json({
@@ -334,16 +322,7 @@ exports.getAdvertisementApplications = async (req, res) => {
 // @route   GET /api/advertisements/my/applications
 exports.getMyApplications = async (req, res) => {
   try {
-    const influencer = await Influencer.findOne({ userId: req.user.id });
-
-    if (!influencer) {
-      return res.status(404).json({
-        success: false,
-        error: 'Influencer profile not found'
-      });
-    }
-
-    const applications = await Application.find({ influencerId: influencer._id })
+    const applications = await Application.find({ userId: req.user.id })
       .populate('advertisementId')
       .sort({ createdAt: -1 });
 

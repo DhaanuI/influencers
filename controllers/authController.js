@@ -1,5 +1,4 @@
 const User = require('../models/User');
-const Influencer = require('../models/Influencer');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 
@@ -69,14 +68,19 @@ exports.signup = async (req, res) => {
     res.status(201).json({
       success: true,
       token,
+      userType: user.userType,
       user: {
         id: user._id,
         email: user.email,
         name: user.name,
         userType: user.userType,
-        companyName: user.companyName,
         plan: user.plan,
-        profileViewsRemaining: user.profileViewsRemaining
+        companyName: user.companyName,
+        profileViewsRemaining: user.profileViewsRemaining,
+        bio: user.bio,
+        followersCount: user.followersCount,
+        category: user.category,
+        applicationsRemaining: user.applicationsRemaining
       }
     });
   } catch (error) {
@@ -103,7 +107,7 @@ exports.login = async (req, res) => {
     }
 
     // Check user exists
-    const user = await User.findOne({ email }).populate('influencerProfile');
+    const user = await User.findOne({ email });
 
     if (!user) {
       return res.status(401).json({
@@ -128,15 +132,19 @@ exports.login = async (req, res) => {
     res.json({
       success: true,
       token,
+      userType: user.userType,
       user: {
         id: user._id,
         email: user.email,
         name: user.name,
         userType: user.userType,
-        companyName: user.companyName,
         plan: user.plan,
+        companyName: user.companyName,
         profileViewsRemaining: user.profileViewsRemaining,
-        influencerProfile: user.influencerProfile
+        bio: user.bio,
+        followersCount: user.followersCount,
+        category: user.category,
+        applicationsRemaining: user.applicationsRemaining
       }
     });
   } catch (error) {
@@ -151,19 +159,26 @@ exports.login = async (req, res) => {
 // @route   GET /api/auth/me
 exports.getMe = async (req, res) => {
   try {
-    const user = await User.findById(req.user.id).populate('influencerProfile');
-    
+    const user = await User.findById(req.user.id);
+
     res.json({
       success: true,
+      userType: user.userType,
       user: {
         id: user._id,
         email: user.email,
         name: user.name,
         userType: user.userType,
-        companyName: user.companyName,
         plan: user.plan,
+        companyName: user.companyName,
         profileViewsRemaining: user.profileViewsRemaining,
-        influencerProfile: user.influencerProfile
+        bio: user.bio,
+        followersCount: user.followersCount,
+        category: user.category,
+        applicationsRemaining: user.applicationsRemaining,
+        instagramUsername: user.instagramUsername,
+        instagramEmbedLinks: user.instagramEmbedLinks,
+        linkedinEmbedLinks: user.linkedinEmbedLinks
       }
     });
   } catch (error) {

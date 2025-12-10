@@ -6,8 +6,7 @@ const userSchema = new mongoose.Schema({
     required: [true, 'Email is required'],
     unique: true,
     lowercase: true,
-    trim: true,
-    match: [/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/, 'Please enter a valid email']
+    trim: true
   },
   password: {
     type: String,
@@ -24,32 +23,59 @@ const userSchema = new mongoose.Schema({
     required: [true, 'Name is required'],
     trim: true
   },
-  // For Startups
-  companyName: {
-    type: String,
-    trim: true
-  },
   plan: {
     type: String,
     enum: ['free', 'basic', 'premium'],
     default: 'free'
   },
+
+  // Startup fields
+  companyName: {
+    type: String,
+    trim: true
+  },
   profileViewsRemaining: {
     type: Number,
-    default: 5 // Free plan gets 5 views
+    default: 5
   },
-  // For Influencers
-  influencerProfile: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Influencer'
+
+  // Influencer fields
+  bio: {
+    type: String,
+    default: ''
   },
+  followersCount: {
+    type: Number,
+    default: 0
+  },
+  category: {
+    type: String,
+    enum: ['fashion', 'fitness', 'food', 'travel', 'tech', 'lifestyle', 'beauty', 'gaming', 'b2b', 'business', 'other'],
+    default: 'other'
+  },
+  instagramUsername: {
+    type: String,
+    trim: true
+  },
+  instagramProfileUrl: {
+    type: String,
+    trim: true
+  },
+  instagramEmbedLinks: [{
+    type: String,
+    trim: true
+  }],
+  linkedinProfileUrl: {
+    type: String,
+    trim: true
+  },
+  linkedinEmbedLinks: [{
+    type: String,
+    trim: true
+  }],
   applicationsRemaining: {
     type: Number,
-    default: 5 // Free plan gets 5 applications per month
-  },
-  isActive: {
-    type: Boolean,
-    default: true
+    default: 5
   }
 }, {
   timestamps: true
