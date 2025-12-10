@@ -178,7 +178,8 @@ exports.getMe = async (req, res) => {
         applicationsRemaining: user.applicationsRemaining,
         instagramUsername: user.instagramUsername,
         instagramEmbedLinks: user.instagramEmbedLinks,
-        linkedinEmbedLinks: user.linkedinEmbedLinks
+        linkedinEmbedLinks: user.linkedinEmbedLinks,
+        youtubeEmbedLinks: user.youtubeEmbedLinks
       }
     });
   } catch (error) {

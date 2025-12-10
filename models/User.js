@@ -73,6 +73,14 @@ const userSchema = new mongoose.Schema({
     type: String,
     trim: true
   }],
+  youtubeChannelUrl: {
+    type: String,
+    trim: true
+  },
+  youtubeEmbedLinks: [{
+    type: String,
+    trim: true
+  }],
   applicationsRemaining: {
     type: Number,
     default: 5

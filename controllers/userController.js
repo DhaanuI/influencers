@@ -53,7 +53,9 @@ exports.updateProfile = async (req, res) => {
       instagramProfileUrl,
       instagramEmbedLinks,
       linkedinProfileUrl,
-      linkedinEmbedLinks
+      linkedinEmbedLinks,
+      youtubeChannelUrl,
+      youtubeEmbedLinks
     } = req.body;
 
     const user = await User.findById(req.user.id);
@@ -74,6 +76,8 @@ exports.updateProfile = async (req, res) => {
     if (instagramEmbedLinks !== undefined) user.instagramEmbedLinks = instagramEmbedLinks;
     if (linkedinProfileUrl !== undefined) user.linkedinProfileUrl = linkedinProfileUrl;
     if (linkedinEmbedLinks !== undefined) user.linkedinEmbedLinks = linkedinEmbedLinks;
+    if (youtubeChannelUrl !== undefined) user.youtubeChannelUrl = youtubeChannelUrl;
+    if (youtubeEmbedLinks !== undefined) user.youtubeEmbedLinks = youtubeEmbedLinks;
 
     await user.save();
 
@@ -120,10 +124,18 @@ exports.addEmbed = async (req, res) => {
         });
       }
       user.linkedinEmbedLinks.push(embedLink);
+    } else if (platform === 'youtube') {
+      if (user.youtubeEmbedLinks.length >= 10) {
+        return res.status(400).json({
+          success: false,
+          error: 'Maximum 10 YouTube embeds allowed'
+        });
+      }
+      user.youtubeEmbedLinks.push(embedLink);
     } else {
       return res.status(400).json({
         success: false,
-        error: 'Invalid platform. Use "instagram" or "linkedin"'
+        error: 'Invalid platform. Use "instagram", "linkedin", or "youtube"'
       });
     }
 
@@ -134,7 +146,8 @@ exports.addEmbed = async (req, res) => {
       message: 'Embed added successfully',
       data: {
         instagramEmbedLinks: user.instagramEmbedLinks,
-        linkedinEmbedLinks: user.linkedinEmbedLinks
+        linkedinEmbedLinks: user.linkedinEmbedLinks,
+        youtubeEmbedLinks: user.youtubeEmbedLinks
       }
     });
   } catch (error) {
