@@ -45,6 +45,10 @@ const userSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Influencer'
   },
+  applicationsRemaining: {
+    type: Number,
+    default: 5 // Free plan gets 5 applications per month
+  },
   isActive: {
     type: Boolean,
     default: true
