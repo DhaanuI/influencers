@@ -1,6 +1,7 @@
 const User = require('../models/User');
 const Influencer = require('../models/Influencer');
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
 
 // Generate JWT Token
 const generateToken = (userId) => {
@@ -12,6 +13,7 @@ const generateToken = (userId) => {
 // @desc    Register user
 // @route   POST /api/auth/signup
 exports.signup = async (req, res) => {
+  console.log('Signup request received');
   try {
     const { email, password, userType, name, companyName } = req.body;
 
@@ -23,8 +25,11 @@ exports.signup = async (req, res) => {
       });
     }
 
+    console.log('Validation passed');
+
     // Check if user exists
     const existingUser = await User.findOne({ email });
+    console.log('Existing user:', existingUser);
     if (existingUser) {
       return res.status(400).json({
         success: false,
@@ -32,10 +37,16 @@ exports.signup = async (req, res) => {
       });
     }
 
+    console.log('User does not exist');
+
+    // Hash password
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
     // Create user
     const userData = {
       email,
-      password,
+      password: hashedPassword,
       userType,
       name
     };
@@ -44,10 +55,16 @@ exports.signup = async (req, res) => {
       userData.companyName = companyName;
     }
 
+    console.log('Creating user...');
+
     const user = await User.create(userData);
+
+    console.log('User created:', user);
 
     // Generate token
     const token = generateToken(user._id);
+
+    console.log('User created:11', user);
 
     res.status(201).json({
       success: true,
@@ -73,6 +90,7 @@ exports.signup = async (req, res) => {
 // @desc    Login user
 // @route   POST /api/auth/login
 exports.login = async (req, res) => {
+  console.log('Login request received');
   try {
     const { email, password } = req.body;
 
@@ -85,8 +103,8 @@ exports.login = async (req, res) => {
     }
 
     // Check user exists
-    const user = await User.findOne({ email }).select('+password').populate('influencerProfile');
-    
+    const user = await User.findOne({ email }).populate('influencerProfile');
+
     if (!user) {
       return res.status(401).json({
         success: false,
@@ -95,8 +113,8 @@ exports.login = async (req, res) => {
     }
 
     // Check password
-    const isPasswordMatch = await user.comparePassword(password);
-    
+    const isPasswordMatch = await bcrypt.compare(password, user.password);
+
     if (!isPasswordMatch) {
       return res.status(401).json({
         success: false,
